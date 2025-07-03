@@ -1,0 +1,1 @@
+# Extract branch/year by slicing email

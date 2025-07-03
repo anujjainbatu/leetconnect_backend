@@ -1,0 +1,1 @@
+ # Pydantic + Mongo schema for leaderboard entries
