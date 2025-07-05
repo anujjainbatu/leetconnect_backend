@@ -12,3 +12,5 @@ class User(BaseModel):
     year: Optional[str]
     # LeetCode username (provided by user)
     leetcode_username: Optional[str]
+    #  only populated for manual‑signup users
+    hashed_password: Optional[str]

@@ -18,3 +18,9 @@ app.add_middleware(
 # Mount routers
 app.include_router(auth.router)
 app.include_router(leaderboard.router)
+
+# app/main.py
+@app.on_event("startup")
+async def on_startup():
+    from .db import ensure_indexes
+    await ensure_indexes()
