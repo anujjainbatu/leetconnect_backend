@@ -5,10 +5,13 @@ from ..schemas.leaderboard import LeaderboardEntry, FilterParams
 from ..crud.leaderboard import fetch_leaderboard
 from ..config import settings
 import jwt
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 router = APIRouter(prefix="/leaderboard", tags=["leaderboard"])
 
-def get_current_user(token: str = Depends(...)) -> str:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
     """
     Decode JWT, return the user’s email, or raise 401 if invalid.
     """
