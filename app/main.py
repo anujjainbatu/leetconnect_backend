@@ -9,7 +9,7 @@ app = FastAPI(title="LeetConnect API")
 # CORS: allow our Chrome extension origin to call these APIs
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["chrome-extension://<YOUR_EXTENSION_ID>"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
