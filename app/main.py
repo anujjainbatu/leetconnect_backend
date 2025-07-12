@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import auth, leaderboard
+from .routers import auth, leaderboard,profile
 from .config import settings
 
 # Create FastAPI app
@@ -18,6 +18,7 @@ app.add_middleware(
 # Mount routers
 app.include_router(auth.router)
 app.include_router(leaderboard.router)
+app.include_router(profile.router)
 
 # app/main.py
 @app.on_event("startup")

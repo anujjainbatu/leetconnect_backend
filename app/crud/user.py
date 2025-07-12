@@ -15,10 +15,17 @@ async def create_user(user: User):
     await db.users.insert_one(user.dict())
     return user
 
-async def set_leetcode_username(email: str, lc_user: str):
-    # Update the user's LeetCode username
-    await db.users.update_one({"email": email}, {"$set": {"leetcode_username": lc_user}})
-
+async def create_user_manual(email: str, name: str, password: str, branch: str, year: str):
+    hashed = hash_password(password)
+    user_doc = {
+        "email": email, "name": name,
+        "branch": branch, "year": year,
+        "hashed_password": hashed,
+        "leetcode_username": None,
+        "friends": []
+    }
+    await db.users.insert_one(user_doc)
+    return User(**user_doc)
 
 
 async def create_user_manual(email: str, name: str, password: str, branch: str, year: str):
@@ -38,3 +45,11 @@ async def authenticate_manual(email: str, password: str):
     if verify_password(password, user["hashed_password"]):
         return user
     return None
+
+
+
+async def update_leetcode_username(email: str, handle: str) -> User:
+    # set the field on the MongoDB document
+    await db.users.update_one({"email": email}, {"$set": {"leetcode_username": handle}})
+    doc = await db.users.find_one({"email": email})
+    return User(**doc)

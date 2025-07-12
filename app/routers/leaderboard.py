@@ -1,32 +1,16 @@
- # `/leaderboard`, `/leaderboard/filter`
-
+# app/routers/leaderboard.py
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from ..schemas.leaderboard import LeaderboardEntry, FilterParams
 from ..crud.leaderboard import fetch_leaderboard
-from ..config import settings
-import jwt
-from fastapi.security import OAuth2PasswordBearer
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+from ..routers.auth import get_current_user_email
 
 router = APIRouter(prefix="/leaderboard", tags=["leaderboard"])
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
-    """
-    Decode JWT, return the user’s email, or raise 401 if invalid.
-    """
-    try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
-        return payload["sub"]
-    except jwt.PyJWTError:
-        raise HTTPException(401, "Invalid token")
-
-@router.get("/", response_model=list[LeaderboardEntry])
-async def list_all(current_user: str = Depends(get_current_user)):
-    # Unfiltered leaderboard
+@router.get("/", response_model=List[LeaderboardEntry])
+async def list_all(current_user: str = Depends(get_current_user_email)):
     return await fetch_leaderboard(FilterParams(), current_user)
 
-@router.post("/filter", response_model=list[LeaderboardEntry])
-async def filtered(params: FilterParams, current_user: str = Depends(get_current_user)):
-    # Branch/year filtered leaderboard
+@router.post("/filter", response_model=List[LeaderboardEntry])
+async def filtered(params: FilterParams, current_user: str = Depends(get_current_user_email)):
     return await fetch_leaderboard(params, current_user)
