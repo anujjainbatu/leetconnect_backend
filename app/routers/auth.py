@@ -45,8 +45,8 @@ async def google_login(req: GoogleAuthRequest):
     
     # Test database connection
     try:
-        from ..db import db
-        await db.admin.command('ping')
+        from ..db import client
+        await client.admin.command('ping')
         logger.info("Database connection successful")
     except Exception as e:
         logger.error(f"Database connection failed: {str(e)}")
