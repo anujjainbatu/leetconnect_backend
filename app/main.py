@@ -34,14 +34,15 @@ app.include_router(leaderboard.router)
 app.include_router(profile.router)
 
 # Initialize database indexes on startup
-@app.on_event("startup")
-async def on_startup():
-    try:
-        from .db import ensure_indexes
-        await ensure_indexes()
-        logger.info("Database indexes created successfully")
-    except Exception as e:
-        logger.error(f"Failed to create database indexes: {e}")
+# Disabled for serverless deployment to avoid event loop conflicts
+# @app.on_event("startup")
+# async def on_startup():
+#     try:
+#         from .db import ensure_indexes
+#         await ensure_indexes()
+#         logger.info("Database indexes created successfully")
+#     except Exception as e:
+#         logger.error(f"Failed to create database indexes: {e}")
 
 # Add a health check endpoint
 @app.get("/")
