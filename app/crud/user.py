@@ -12,7 +12,7 @@ async def get_user_by_email(email: str) -> Optional[User]:
 
 async def create_user(user: User):
     # Insert new user document
-    await db.users.insert_one(user.dict())
+    await db.users.insert_one(user.model_dump())
     return user
 
 async def create_user_manual(email: str, name: str, password: str, branch: str, year: str):
