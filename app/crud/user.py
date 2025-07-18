@@ -46,11 +46,3 @@ async def update_leetcode_username(email: str, handle: str) -> User:
     await db.users.update_one({"email": email}, {"$set": {"leetcode_username": handle}})
     doc = await db.users.find_one({"email": email})
     return User(**doc)
-
-
-
-async def update_leetcode_username(email: str, handle: str) -> User:
-    # set the field on the MongoDB document
-    await db.users.update_one({"email": email}, {"$set": {"leetcode_username": handle}})
-    doc = await db.users.find_one({"email": email})
-    return User(**doc)

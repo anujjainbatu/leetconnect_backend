@@ -46,14 +46,34 @@ async def google_login(req: GoogleAuthRequest):
         branch, year = parse_branch_year(email)
         # Get name from Google token, fallback to email if not available
         name = info.get("name", email.split("@")[0])
-        user = await create_user(User(
-            email=email,
-            name=name,
-            branch=branch,
-            year=year
-        ))
+        
+        logger.info(f"Creating new user with email: {email}, name: {name}, branch: {branch}, year: {year}")
+        
+        try:
+            user = await create_user(User(
+                email=email,
+                name=name,
+                branch=branch,
+                year=year
+            ))
+            logger.info(f"User created successfully: {email}")
+        except Exception as e:
+            logger.error(f"Error creating user: {str(e)}")
+            raise HTTPException(500, f"Error creating user: {str(e)}")
+    else:
+        logger.info(f"User already exists: {email}")
+    
     token = jwt.encode({"sub": email}, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
     return TokenResponse(access_token=token)
+
+# Google OAuth callback endpoint for redirect URIs
+@router.get("/google/callback")
+async def google_callback():
+    """
+    This endpoint is for OAuth redirect URIs but actual token exchange 
+    happens in the frontend, so this just returns a success message.
+    """
+    return {"message": "OAuth callback received. Token exchange should be handled in frontend."}
 
 # Debug endpoint to test Google token verification
 @router.post("/debug-google")
