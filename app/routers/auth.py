@@ -41,7 +41,20 @@ async def google_login(req: GoogleAuthRequest):
         raise HTTPException(401, f"Invalid token: {str(e)}")
 
     email = info["email"]
+    logger.info(f"Checking if user exists: {email}")
+    
+    # Test database connection
+    try:
+        from ..db import db
+        await db.admin.command('ping')
+        logger.info("Database connection successful")
+    except Exception as e:
+        logger.error(f"Database connection failed: {str(e)}")
+        raise HTTPException(500, f"Database connection failed: {str(e)}")
+    
     user = await get_user_by_email(email)
+    logger.info(f"User lookup result: {'Found' if user else 'Not found'}")
+    
     if not user:
         branch, year = parse_branch_year(email)
         # Get name from Google token, fallback to email if not available
@@ -63,7 +76,9 @@ async def google_login(req: GoogleAuthRequest):
     else:
         logger.info(f"User already exists: {email}")
     
+    logger.info(f"Generating JWT token for: {email}")
     token = jwt.encode({"sub": email}, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+    logger.info(f"JWT token generated successfully")
     return TokenResponse(access_token=token)
 
 # Google OAuth callback endpoint for redirect URIs

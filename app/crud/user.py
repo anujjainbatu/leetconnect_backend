@@ -7,8 +7,15 @@ from ..utils.security import hash_password, verify_password
 
 async def get_user_by_email(email: str) -> Optional[User]:
     # Fetch a user document by email
-    data = await db.users.find_one({"email": email})
-    return User(**data) if data else None
+    try:
+        data = await db.users.find_one({"email": email})
+        return User(**data) if data else None
+    except Exception as e:
+        # Log the error and return None to indicate user not found
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching user by email {email}: {str(e)}")
+        return None
 
 async def create_user(user: User):
     # Insert new user document
