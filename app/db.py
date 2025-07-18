@@ -2,6 +2,12 @@
 
 import motor.motor_asyncio
 from .config import settings
+import ssl
+
+# Create SSL context for serverless environments
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 # Initialize Motor (async MongoDB) client with serverless-friendly settings
 client = motor.motor_asyncio.AsyncIOMotorClient(
@@ -12,6 +18,10 @@ client = motor.motor_asyncio.AsyncIOMotorClient(
     serverSelectionTimeoutMS=10000,  # 10 second timeout
     socketTimeoutMS=10000,  # 10 second socket timeout
     connectTimeoutMS=10000,  # 10 second connection timeout
+    tls=True,  # Enable TLS
+    tlsAllowInvalidCertificates=True,  # Allow invalid certificates for serverless
+    tlsAllowInvalidHostnames=True,  # Allow invalid hostnames for serverless
+    retryWrites=True,  # Enable retryable writes
 )
 
 # 🎯 Explicitly pick the DB name
