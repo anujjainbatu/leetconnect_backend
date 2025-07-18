@@ -10,8 +10,10 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
+logger = logging.getLogger(__name__)
+
 # Create FastAPI app
-app = FastAPI(title="LeetConnect API")
+app = FastAPI(title="LeetConnect API", version="1.0.0")
 
 # CORS: allow our Chrome extension origin to call these APIs
 app.add_middleware(
@@ -30,13 +32,25 @@ app.include_router(profile.router)
 # Initialize database indexes on startup
 @app.on_event("startup")
 async def on_startup():
-    from .db import ensure_indexes
-    await ensure_indexes()
+    try:
+        from .db import ensure_indexes
+        await ensure_indexes()
+        logger.info("Database indexes created successfully")
+    except Exception as e:
+        logger.error(f"Failed to create database indexes: {e}")
 
 # Add a health check endpoint
 @app.get("/")
 async def health_check():
     return {"status": "healthy", "message": "LeetConnect API is running"}
+
+# Add a version endpoint
+@app.get("/version")
+async def get_version():
+    return {"version": "1.0.0", "api": "LeetConnect"}
+
+# Export the app for Vercel
+handler = app
 
 # Export the app for Vercel
 handler = app
