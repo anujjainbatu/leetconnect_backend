@@ -3,8 +3,16 @@
 import motor.motor_asyncio
 from .config import settings
 
-# Initialize Motor (async MongoDB) client
-client = motor.motor_asyncio.AsyncIOMotorClient(settings.MONGODB_URI)
+# Initialize Motor (async MongoDB) client with serverless-friendly settings
+client = motor.motor_asyncio.AsyncIOMotorClient(
+    settings.MONGODB_URI,
+    maxPoolSize=1,  # Limit connection pool for serverless
+    minPoolSize=0,  # Allow connections to be closed
+    maxIdleTimeMS=30000,  # Close idle connections after 30 seconds
+    serverSelectionTimeoutMS=10000,  # 10 second timeout
+    socketTimeoutMS=10000,  # 10 second socket timeout
+    connectTimeoutMS=10000,  # 10 second connection timeout
+)
 
 # 🎯 Explicitly pick the DB name
 db = client[settings.MONGODB_DB]

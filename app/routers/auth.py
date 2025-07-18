@@ -43,15 +43,6 @@ async def google_login(req: GoogleAuthRequest):
     email = info["email"]
     logger.info(f"Checking if user exists: {email}")
     
-    # Test database connection
-    try:
-        from ..db import client
-        await client.admin.command('ping')
-        logger.info("Database connection successful")
-    except Exception as e:
-        logger.error(f"Database connection failed: {str(e)}")
-        raise HTTPException(500, f"Database connection failed: {str(e)}")
-    
     user = await get_user_by_email(email)
     logger.info(f"User lookup result: {'Found' if user else 'Not found'}")
     
