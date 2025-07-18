@@ -1,7 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import auth, leaderboard,profile
+from .routers import auth, leaderboard, profile
 from .config import settings
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 # Create FastAPI app
 app = FastAPI(title="LeetConnect API")
@@ -20,8 +27,16 @@ app.include_router(auth.router)
 app.include_router(leaderboard.router)
 app.include_router(profile.router)
 
-# app/main.py
+# Initialize database indexes on startup
 @app.on_event("startup")
 async def on_startup():
     from .db import ensure_indexes
     await ensure_indexes()
+
+# Add a health check endpoint
+@app.get("/")
+async def health_check():
+    return {"status": "healthy", "message": "LeetConnect API is running"}
+
+# Export the app for Vercel
+handler = app

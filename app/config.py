@@ -2,11 +2,12 @@ from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 import os
 from pathlib import Path
-# Force‐load .env from project root
-HERE = Path(__file__).parent.parent  # up from app/ to project root
+
+# Only load .env file if it exists (for local development)
+HERE = Path(__file__).parent.parent
 env_file = HERE / ".env"
-# print("🔍 Explicitly loading .env at:", env_file)
-load_dotenv(env_file, override=True)
+if env_file.exists():
+    load_dotenv(env_file, override=True)
 
 class Settings(BaseSettings):
     # MongoDB connection string
@@ -22,8 +23,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
 
     class Config:
-        # Load variables from .env in project root
+        # This will load from environment variables in production
         env_file = None
+        case_sensitive = True
 
 # Instantiate once and reuse
 settings = Settings()
